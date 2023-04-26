@@ -4,6 +4,13 @@
 
 Based on [this](https://web.archive.org/web/20230426101859/https://banzaicloud.com/blog/inject-secrets-into-pods-vault-revisited/) blog post.
 
+## What's this about?
+
+[Bank-Vaults](https://bank-vaults.dev) is able to inject secrets directly into your applications running on Kubernetes
+**without** using Kubernetes secrets.
+
+This repo is a quick and easy demonstration of the feature.
+
 ## Prerequisites
 
 - Ability to setup a Kubernetes cluster (eg. using [KinD](https://kind.sigs.k8s.io/))
