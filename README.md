@@ -98,6 +98,12 @@ Port forward to the `http-echo` service:
 kubectl port-forward service/http-echo 8080 1>/dev/null &
 ```
 
+Look at the Pod (and notice that no mutation happened):
+
+```shell
+kubectl get pods -o yaml
+```
+
 Look at the environment variable values:
 
 ```shell
@@ -125,6 +131,12 @@ _(You have to restart the port forward at this point):_
 kill %2
 wait %2
 kubectl port-forward service/http-echo 8080 1>/dev/null &
+```
+
+Look at the Pod (and notice a number of mutations: init container, volumes and mounts, entrypoint (command) changed):
+
+```shell
+kubectl get pods -o yaml
 ```
 
 Look at the environment variable values again:
