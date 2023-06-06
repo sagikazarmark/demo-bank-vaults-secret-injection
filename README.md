@@ -41,7 +41,7 @@ helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
 Install the [Vault operator](https://bank-vaults.dev/docs/operator/):
 
 ```shell
-helm upgrade --install --wait --namespace vault-system --create-namespace vault-operator banzaicloud-stable/vault-operator
+helm upgrade --install --wait --namespace vault-system --create-namespace vault-operator oci://ghcr.io/bank-vaults/helm-charts/vault-operator
 ```
 
 Install the [mutating webhook](https://bank-vaults.dev/docs/mutating-webhook/):
