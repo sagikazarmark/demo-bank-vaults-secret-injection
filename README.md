@@ -32,12 +32,6 @@ kind create cluster
 
 _The rest of the instructions assume your current context is set to your demo cluster._
 
-Add the `banzaicloud-stable` repo to Helm:
-
-```shell
-helm repo add banzaicloud-stable https://kubernetes-charts.banzaicloud.com
-```
-
 Install the [Vault operator](https://bank-vaults.dev/docs/operator/):
 
 ```shell
@@ -47,7 +41,7 @@ helm upgrade --install --wait --namespace vault-system --create-namespace vault-
 Install the [mutating webhook](https://bank-vaults.dev/docs/mutating-webhook/):
 
 ```shell
-helm upgrade --install --wait --namespace vault-system --create-namespace vault-secrets-webhook banzaicloud-stable/vault-secrets-webhook
+helm upgrade --install --wait --namespace vault-system --create-namespace vault-secrets-webhook oci://ghcr.io/bank-vaults/helm-charts/vault-secrets-webhook
 ```
 
 Install a new Vault instance:
