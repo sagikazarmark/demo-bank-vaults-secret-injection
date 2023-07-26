@@ -3,23 +3,45 @@ kind: Vault
 metadata:
   name: vault
 spec:
-  size: 1
+  size: 3
   image: vault:1.13.1
 
   # Specify the ServiceAccount where the Vault Pod and the Bank-Vaults configurer/unsealer is running
   serviceAccount: vault
 
   # Specify the Service's type where the Vault Service is exposed
-  # serviceType: ClusterIP
+  serviceType: ClusterIP
 
-  # Use local disk to store Vault file data, see config section.
-  volumes:
-    - name: vault-file
-      persistentVolumeClaim:
-        claimName: vault-file
+  # In some cases, you have to set permissions for the raft directory.
+  # For example in the case of using a local kind cluster, uncomment the lines below.
+  vaultInitContainers:
+    - name: raft-permission
+      image: busybox
+      command:
+        - /bin/sh
+        - -c
+        - |
+          chown -R 100:1000 /vault/file
+      volumeMounts:
+        - name: vault-raft
+          mountPath: /vault/file
+
+  # Use local disk to store Vault raft data, see config section.
+  volumeClaimTemplates:
+    - metadata:
+        name: vault-raft
+      spec:
+        # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#class-1
+        # storageClassName: ""
+        accessModes:
+          - ReadWriteOnce
+        volumeMode: Filesystem
+        resources:
+          requests:
+            storage: 1Gi
 
   volumeMounts:
-    - name: vault-file
+    - name: vault-raft
       mountPath: /vault/file
 
   # Describe where you would like to store the Vault unseal keys and root token.
@@ -38,14 +60,18 @@ spec:
   # See https://www.vaultproject.io/docs/configuration/ for more information.
   config:
     storage:
-      file:
-        path: /vault/file
+      raft:
+        path: "/vault/file"
     listener:
       tcp:
         address: "0.0.0.0:8200"
         tls_disable: true
+    api_addr: https://vault.vault:8200
+    cluster_addr: "https://${.Env.POD_NAME}:8201"
     ui: true
     log_level: debug
+
+  serviceRegistrationEnabled: true
 
   # See: https://bank-vaults.dev/docs/cli-tool/#example-external-vault-configuration
   # The repository also contains a lot examples in the test/deploy and operator/deploy directories.
@@ -139,17 +165,3 @@ spec:
   # sidecarEnvsConfig:
   #   - name: VAULT_ADDR
   #     value: https://vault.local:8200
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: vault-file
-spec:
-  # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#class-1
-  # storageClassName: ""
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
