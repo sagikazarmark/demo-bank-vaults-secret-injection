@@ -54,7 +54,7 @@ spec:
       # This is true by default
       storeRootToken: true
     kubernetes:
-      secretNamespace: vault
+      secretNamespace: custom-vault-namespace
 
   # A YAML representation of a final vault config file.
   # See https://www.vaultproject.io/docs/configuration/ for more information.
@@ -66,7 +66,7 @@ spec:
       tcp:
         address: "0.0.0.0:8200"
         tls_disable: true
-    api_addr: https://vault.vault:8200
+    api_addr: https://vault:8200
     cluster_addr: "https://${.Env.POD_NAME}:8201"
     ui: true
     log_level: debug
@@ -102,11 +102,11 @@ spec:
         configuration:
           config:
           - name: urls
-            issuing_certificates: https://vault.default:8200/v1/pki/ca
-            crl_distribution_points: https://vault.default:8200/v1/pki/crl
+            issuing_certificates: https://vault:8200/v1/pki/ca
+            crl_distribution_points: https://vault:8200/v1/pki/crl
           root/generate:
           - name: internal
-            common_name: vault.default
+            common_name: vault
           roles:
           - name: default
             allowed_domains: localhost,pod,svc,default
@@ -134,7 +134,7 @@ spec:
           # Allow access for Vault
           - name: vault
             bound_service_account_names: ["vault"]
-            bound_service_account_namespaces: ["vault"]
+            bound_service_account_namespaces: ["custom-vault-namespace"]
             policies: ["allow_secrets", "allow_pki"]
             ttl: 1h
 
